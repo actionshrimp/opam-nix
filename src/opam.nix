@@ -48,6 +48,7 @@ let
     dev = false;
     with-test = false;
     with-doc = false;
+    required-by = [ ];
   };
 
   mergeSortVersions = zipAttrsWith (_: sort (compareVersions' "lt"));
@@ -178,6 +179,10 @@ in rec {
             ${optionalString best-effort "--best-effort"} \
             ${optionalString (!isNull env) "--environment '${environment}'"} \
             ${optionalString (!isNull criteria) "--criteria='${criteria}'"} \
+            ${
+              optionalString (length required-by != 0)
+              "--required-by='${concatStringsSep "," required-by}'"
+            } \
             | tee $out
         '';
       solution = fileContents resolve-drv;
