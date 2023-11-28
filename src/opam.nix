@@ -206,8 +206,7 @@ in rec {
 
   makeOpamRepoFromFiles = dir: opamFiles :
     let
-      packages = concatLists (collect isList (mapAttrsRecursive
-        (path': _: [rec {
+      packages = map (path': {
           fileName = last path';
           dirName =
             splitNameVer (if init path' != [ ] then last (init path') else "");
@@ -226,7 +225,7 @@ in rec {
           source = dir + subdir;
           opamFile = "${dir + ("/" + (concatStringsSep "/" path'))}";
           opamFileContents = readFile opamFile;
-        }]) opamFiles));
+        }) opamFiles;
       repo-description =
         namePathPair "repo" (toFile "repo" ''opam-version: "2.0"'');
       opamFileLinks = map ({ name, version, opamFile, ... }:
@@ -261,7 +260,8 @@ in rec {
       opamFilesOnly =
         converge (filterAttrsRecursive (_: v: v != { })) opamFiles;
       in
-      makeOpamRepoFromFiles dir opamFilesOnly;
+        makeOpamRepoFromFiles dir
+          (concatLists (mapAttrsRecursive (path': _: [path']) opamFilesOnly));
 
   makeOpamRepo = makeOpamRepo' false;
   makeOpamRepoRec = makeOpamRepo' true;
