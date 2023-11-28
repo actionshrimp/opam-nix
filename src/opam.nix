@@ -263,7 +263,7 @@ in rec {
           (concatLists
             (collect isList
               (mapAttrsRecursive
-                (path': _: [ concatStringsSep "/" path' ]) opamFilesOnly)));
+                (path': _: concatStringsSep "/" path') opamFilesOnly)));
 
   makeOpamRepo = makeOpamRepo' false;
   makeOpamRepoRec = makeOpamRepo' true;
