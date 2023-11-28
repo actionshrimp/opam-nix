@@ -204,19 +204,8 @@ in rec {
 
     in lines solution;
 
-  makeOpamRepo' = recursive: dir:
+  makeOpamRepoFromFiles = opamFiles :
     let
-      contents = readDir dir;
-      files = if recursive then
-        readDirRecursive dir
-      else
-        (contents // optionalAttrs (contents.opam or null == "directory") {
-          opam = readDir "${dir}/opam";
-        });
-      opamFiles = filterAttrsRecursive
-        (name: value: isAttrs value || hasSuffix "opam" name) files;
-      opamFilesOnly =
-        converge (filterAttrsRecursive (_: v: v != { })) opamFiles;
       packages = concatLists (collect isList (mapAttrsRecursive
         (path': _: [rec {
           fileName = last path';
@@ -257,6 +246,22 @@ in rec {
         }) { } packages;
       repo = linkFarm "opam-repo" ([ repo-description ] ++ opamFileLinks);
     in repo // { passthru = { inherit sourceMap pkgdefs; }; };
+
+  makeOpamRepo' = recursive: dir:
+    let
+      contents = readDir dir;
+      files = if recursive then
+        readDirRecursive dir
+      else
+        (contents // optionalAttrs (contents.opam or null == "directory") {
+          opam = readDir "${dir}/opam";
+        });
+      opamFiles = filterAttrsRecursive
+        (name: value: isAttrs value || hasSuffix "opam" name) files;
+      opamFilesOnly =
+        converge (filterAttrsRecursive (_: v: v != { })) opamFiles;
+      in
+      makeOpamRepoFromFiles opamFilesOnly;
 
   makeOpamRepo = makeOpamRepo' false;
   makeOpamRepoRec = makeOpamRepo' true;
