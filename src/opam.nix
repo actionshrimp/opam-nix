@@ -222,7 +222,7 @@ in rec {
             "dev");
           subdir = "/" + (if baseNameOf dirName == "opam" then dirOf dirName else dirName);
           source = dir + subdir;
-          opamFile = path;
+          opamFile = "${dir + "/" + path}";
           opamFileContents = readFile opamFile;
         }) opamFiles;
       repo-description =
