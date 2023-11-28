@@ -124,12 +124,12 @@ in rec {
       isStorePath = p: !isNull (match "[0-9a-z]{32}-.*" p);
       dir = baseNameOf (dirOf opamFile);
       basename = baseNameOf opamFile;
-      name = if !isStorePath basename && hasSuffix ".opam" basename then
+      name = builtins.trace "opamFile: hello" (if !isStorePath basename && hasSuffix ".opam" basename then
         basename
-      else builtins.trace "opamFile: ${opamFile}" (if !isStorePath basename && !isStorePath dir then
+      else (if !isStorePath basename && !isStorePath dir then
         "${dir}.opam"
       else
-        "opam");
+        "opam"));
       json = runCommand "${name}.json" {
         preferLocalBuild = true;
         allowSubstitutes = false;
