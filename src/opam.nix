@@ -204,7 +204,7 @@ in rec {
 
     in lines solution;
 
-  makeOpamRepoFromFiles = opamFiles :
+  makeOpamRepoFromFiles = dir: opamFiles :
     let
       packages = concatLists (collect isList (mapAttrsRecursive
         (path': _: [rec {
@@ -261,7 +261,7 @@ in rec {
       opamFilesOnly =
         converge (filterAttrsRecursive (_: v: v != { })) opamFiles;
       in
-      makeOpamRepoFromFiles opamFilesOnly;
+      makeOpamRepoFromFiles dir opamFilesOnly;
 
   makeOpamRepo = makeOpamRepo' false;
   makeOpamRepoRec = makeOpamRepo' true;
