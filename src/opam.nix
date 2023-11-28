@@ -260,8 +260,10 @@ in rec {
         converge (filterAttrsRecursive (_: v: v != { })) opamFiles;
       in
         makeOpamRepoFromFiles dir
-          (concatLists (collect isList
-            (mapAttrsRecursive (path': _: [path']) opamFilesOnly)));
+          (concatLists
+            (collect isList
+              (mapAttrsRecursive
+                (path': _: [ concatStringsSep "/" path' ]) opamFilesOnly)));
 
   makeOpamRepo = makeOpamRepo' false;
   makeOpamRepoRec = makeOpamRepo' true;
