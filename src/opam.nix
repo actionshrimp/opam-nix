@@ -206,7 +206,7 @@ in rec {
 
   makeOpamRepoFromFiles = dir: opamFiles :
     let
-      packages = map (path': {
+      packages = map (path': rec {
           fileName = last path';
           dirName =
             splitNameVer (if init path' != [ ] then last (init path') else "");
