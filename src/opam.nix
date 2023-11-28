@@ -226,7 +226,7 @@ in rec {
           source = dir + subdir;
           opamFile = "${dir + ("/" + (concatStringsSep "/" path'))}";
           opamFileContents = readFile opamFile;
-        }]) opamFilesOnly));
+        }]) opamFiles));
       repo-description =
         namePathPair "repo" (toFile "repo" ''opam-version: "2.0"'');
       opamFileLinks = map ({ name, version, opamFile, ... }:
