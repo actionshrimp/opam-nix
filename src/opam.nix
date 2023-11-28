@@ -206,24 +206,23 @@ in rec {
 
   makeOpamRepoFromFiles = dir: opamFiles :
     let
-      packages = map (path': rec {
-          fileName = last path';
-          dirName =
-            splitNameVer (if init path' != [ ] then last (init path') else "");
+      packages = map (path: rec {
+          fileName = baseNameOf path;
+          dirName = dirOf path;
+          packageFolderName = splitNameVer (builtins.baseNameOf dirName);
           parsedOPAM = importOpam opamFile;
           name = parsedOPAM.name or (if hasSuffix ".opam" fileName then
             removeSuffix ".opam" fileName
           else
-            dirName.name);
+            packageFolderName.name);
 
-          version = parsedOPAM.version or (if dirName.version != "" then
-            dirName.version
+          version = parsedOPAM.version or (if packageFolderName.version != "" then
+            packageFolderName.version
           else
             "dev");
-          subdir = "/" + concatStringsSep "/" (let i = init path';
-          in if length i > 0 && last i == "opam" then init i else i);
+          subdir = "/" + (if baseNameOf dirName == "opam" then dirOf dirName else dirName);
           source = dir + subdir;
-          opamFile = "${dir + ("/" + (concatStringsSep "/" path'))}";
+          opamFile = path;
           opamFileContents = readFile opamFile;
         }) opamFiles;
       repo-description =
